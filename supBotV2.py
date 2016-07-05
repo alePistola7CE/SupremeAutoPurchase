@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from splinter import Browser
 
+
 product = "tops-sweaters/lh6fienmo/xe56n8acm"
 mainUrl = "http://www.supremenewyork.com/shop/all"
 baseUrl = "http://supremenewyork.com"
@@ -15,6 +16,9 @@ emailfield = "Test@example.com"
 phonefield = "5555555555"
 addressfield = "1600 Pennsylvania Avenue NW"
 cityfield = "Paris" 
+Hset = 17
+Mset = 5
+Sset = 0
 zipfield = "20500"
 statefield = "FR" #have to use the value "FR" OR "IT", for more information see the html of the dropdown menu on the supreme page
 cctypefield = "master"  # "master" "visa" "american_express"
@@ -41,12 +45,36 @@ def parse(r):
 def checkproduct(l):
     if product in l:
         prdurl = baseUrl + l
-        print(prdurl)
-        buyprd(prdurl)
-    else 
+        print("Product url found:" + prdurl)
+	checktime(prdurl)
+    else:
+	prdurl = baseUrl + l
 	print("Product <" + prdurl + "> not found")
 	return
 
+def checktime(prdurl):
+	prdurl = prdurl
+	localtime = time.localtime(time.time())
+	realH = localtime[3]
+	realM = localtime[4]
+	realS = localtime[5]
+	if realH == Hset:
+		if realM >= Mset:
+			if realS >= Sset:
+				buyprd(prdurl)
+			else:
+				print("Retry in: " + str(realS - Sset) + "second/s")
+				time.sleep(realS-Sset)
+				checktime()
+		else:
+			print("Retry in: " + str(realM-Mset) + "minute/s and " + str(realS-Sset) + "seconds")
+			time.sleep(10000)
+			checktime()
+	else:
+		print("Too early, retry in " + str(realH - Hset) + "hour/s")
+		sys.exit(0)
+	
+			
 
 def buyprd(u):
     executable_path = {'executable_path':'C:\\Users\\Paolo\\AppData\\Local\\Google\\chromedriver'} #need to install chromedriver and add the executable path to the constructor
