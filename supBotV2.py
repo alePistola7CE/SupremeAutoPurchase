@@ -14,7 +14,7 @@ namefield = "John Doe"
 emailfield = "Test@example.com"
 phonefield = "5555555555"
 addressfield = "1600 Pennsylvania Avenue NW"
-cityfield = "Paris" #cityFiled were omissed
+cityfield = "Paris" 
 zipfield = "20500"
 statefield = "FR" #have to use the value "FR" OR "IT", for more information see the html of the dropdown menu on the supreme page
 cctypefield = "master"  # "master" "visa" "american_express"
@@ -43,6 +43,9 @@ def checkproduct(l):
         prdurl = baseUrl + l
         print(prdurl)
         buyprd(prdurl)
+    else 
+	print("Product <" + prdurl + "> not found")
+	return
 
 
 def buyprd(u):
@@ -89,6 +92,6 @@ i = 0
 
 while (True):
     main()
-    print("On try number " + str(i))
     i = i + 1
+    print("On try number " + str(i))
     time.sleep(2)
