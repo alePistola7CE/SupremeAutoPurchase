@@ -6,7 +6,9 @@ from bs4 import BeautifulSoup
 from splinter import Browser
 
 
-product = "tops-sweaters/lh6fienmo/xe56n8acm"
+category = "/jackets"
+productName = "Shadow Plaid Wool Overcoat"
+product = "jackets/jqotka3zd/baft9gw5k"
 mainUrl = "http://www.supremenewyork.com/shop/all"
 baseUrl = "http://supremenewyork.com"
 checkoutUrl = "https://www.supremenewyork.com/checkout"
@@ -15,10 +17,10 @@ namefield = "John Doe"
 emailfield = "Test@example.com"
 phonefield = "5555555555"
 addressfield = "1600 Pennsylvania Avenue NW"
-cityfield = "Paris" 
-Hset = 17
-Mset = 5
-Sset = 0
+cityfield = "Paris"
+Hset = 16
+Mset = 10
+Sset = 10
 zipfield = "20500"
 statefield = "FR" #have to use the value "FR" OR "IT", for more information see the html of the dropdown menu on the supreme page
 cctypefield = "master"  # "master" "visa" "american_express"
@@ -39,18 +41,31 @@ def parse(r):
     soup = BeautifulSoup(r, "html.parser")
     for a in soup.find_all('a', href=True):
         link = a['href']
-        checkproduct(link)
+        #checkproduct(link)
+        search_by_keyword(productName)
+
+
+#beta def search_by_keyword(kw)
+def search_by_keyword(productName):
+        if category != "" and productName != "":
+            r = requests.get(mainUrl + category)
+            soup = BeautifulSoup(r.content, "html.parser")
+            for item in soup.find_all('a', {'class': 'name-link'}):
+                if productName == item.text:
+                    print ('Product ' + productName + ' found: url -> "' + item['href'] + '"')
+                    product = item['href']
+                    checktime(baseUrl + product)
 
 
 def checkproduct(l):
     if product in l:
         prdurl = baseUrl + l
         print("Product url found:" + prdurl)
-	checktime(prdurl)
+        checktime(prdurl)
     else:
-	prdurl = baseUrl + l
-	print("Product <" + prdurl + "> not found")
-	return
+	    prdurl = baseUrl + l
+	    print("Product <" + prdurl + "> not found")
+	    return
 
 def checktime(prdurl):
 	prdurl = prdurl
@@ -63,21 +78,20 @@ def checktime(prdurl):
 			if realS >= Sset:
 				buyprd(prdurl)
 			else:
-				print("Retry in: " + str(realS - Sset) + "second/s")
-				time.sleep(realS-Sset)
-				checktime()
+				print("Retry in: " + str(Sset - realS) + "second/s")
+				time.sleep(Sset - realS)
+				main()
 		else:
-			print("Retry in: " + str(realM-Mset) + "minute/s and " + str(realS-Sset) + "seconds")
-			time.sleep(10000)
-			checktime()
+			print("Retry in: " + str(Mset-realM) + "minute/s and " + str(Sset) + "seconds")
+			time.sleep(15)
+			main()
 	else:
-		print("Too early, retry in " + str(realH - Hset) + "hour/s")
+		print("Too early brooo, retry tomorrow :D")
 		sys.exit(0)
-	
-			
+
 
 def buyprd(u):
-    executable_path = {'executable_path':'C:\\Users\\Paolo\\AppData\\Local\\Google\\chromedriver'} #need to install chromedriver and add the executable path to the constructor
+    executable_path = {'executable_path':'C:\\Users\\YourUsername\\AppData\\Local\\Google\\chromedriver'} #need to install chromedriver and add the executable path to the constructor
     browser = Browser('chrome', **executable_path )
     url = u
     browser.visit(url)
@@ -89,7 +103,7 @@ def buyprd(u):
     else:
         print("Error")
         return
-    print("checking out")
+    print("Checking out")
     browser.visit(checkoutUrl)
     print("Filling Out Billing Info")
     browser.fill("order[billing_name]", namefield)
