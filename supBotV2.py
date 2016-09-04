@@ -14,12 +14,12 @@ baseUrl = "http://supremenewyork.com"
 checkoutUrl = "https://www.supremenewyork.com/checkout"
 selectOption = "Large"
 namefield = "John Doe"
-emailfield = "Test@example.com"
+emailfield = "mario.rossi@gmail.com"
 phonefield = "5555555555"
 addressfield = "1600 Pennsylvania Avenue NW"
 cityfield = "Paris"
-Hset = 16
-Mset = 10
+Hset = 22
+Mset = 1
 Sset = 10
 zipfield = "20500"
 statefield = "FR" #have to use the value "FR" OR "IT", for more information see the html of the dropdown menu on the supreme page
@@ -32,39 +32,47 @@ cccvcfield = "800"  # Randomly Generated Data (aka, this isn't mine)
 
 def main():
     print("")
+    print("[i] Bot started correctly")
+    parse()
+
+
+def parse():
+    if category != "" and productName != "":
+        print("[i] Looking for " + productName)
+        search_by_keyword(productName)
+    else:
+        print("[i] Looking for "+ product)
+        search_by_link()
+
+
+
+def search_by_link():
     r = requests.get(mainUrl).text
-    if product in r:
-        parse(r)
-
-
-def parse(r):
     soup = BeautifulSoup(r, "html.parser")
     for a in soup.find_all('a', href=True):
         link = a['href']
-        #checkproduct(link)
-        search_by_keyword(productName)
+        checkproduct(link)
 
 
 #beta def search_by_keyword(kw)
 def search_by_keyword(productName):
-        if category != "" and productName != "":
-            r = requests.get(mainUrl + category)
-            soup = BeautifulSoup(r.content, "html.parser")
-            for item in soup.find_all('a', {'class': 'name-link'}):
-                if productName == item.text:
-                    print ('Product ' + productName + ' found: url -> "' + item['href'] + '"')
-                    product = item['href']
-                    checktime(baseUrl + product)
+    r = requests.get(mainUrl + category)
+    soup = BeautifulSoup(r.content, "html.parser")
+    for item in soup.find_all('a', {'class': 'name-link'}):
+        if productName == item.text:
+            print ('[i] Product ' + productName + ' found: url -> "' + item['href'] + '"')
+            product = item['href']
+            checktime(baseUrl + product)
 
 
 def checkproduct(l):
     if product in l:
         prdurl = baseUrl + l
-        print("Product url found:" + prdurl)
+        print("[i] Product url found:" + prdurl)
         checktime(prdurl)
     else:
 	    prdurl = baseUrl + l
-	    print("Product <" + prdurl + "> not found")
+	    print("[x] Product <" + prdurl + "> not found")
 	    return
 
 def checktime(prdurl):
@@ -137,3 +145,4 @@ while (True):
     i = i + 1
     print("On try number " + str(i))
     time.sleep(2)
+
