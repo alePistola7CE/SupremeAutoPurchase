@@ -18,9 +18,9 @@ emailfield = "mario.rossi@gmail.com"
 phonefield = "5555555555"
 addressfield = "1600 Pennsylvania Avenue NW"
 cityfield = "Paris"
-Hset = 22
-Mset = 1
-Sset = 10
+Hset = 17
+Mset = 4
+Sset = 6
 zipfield = "20500"
 statefield = "FR" #have to use the value "FR" OR "IT", for more information see the html of the dropdown menu on the supreme page
 cctypefield = "master"  # "master" "visa" "american_express"
@@ -86,44 +86,45 @@ def checktime(prdurl):
 			if realS >= Sset:
 				buyprd(prdurl)
 			else:
-				print("Retry in: " + str(Sset - realS) + "second/s")
+				print("[x] Retry in: " + str(Sset - realS) + "second/s")
 				time.sleep(Sset - realS)
-				main()
+				checktime(prdurl)
 		else:
-			print("Retry in: " + str(Mset-realM) + "minute/s and " + str(Sset) + "seconds")
-			time.sleep(15)
-			main()
+			print("[x] Retry in: " + str(Mset-realM) + "minute/s and " + str(Sset) + "seconds")
+			time.sleep(2)
+			checktime(prdurl)
 	else:
-		print("Too early brooo, retry tomorrow :D")
+		print("[x] Too early brooo, retry tomorrow :D")
 		sys.exit(0)
 
 
 def buyprd(u):
-    executable_path = {'executable_path':'C:\\Users\\YourUsername\\AppData\\Local\\Google\\chromedriver'} #need to install chromedriver and add the executable path to the constructor
-    browser = Browser('chrome', **executable_path )
+    localtime = time.localtime(time.time())
+    #print("[i] Ora inizio acquisto : %s" % str(time.localtime()))
+    print("[i] Ora inizio acquisto : %s:%s:%s" % (str(localtime[3]), str(localtime[4]), str(localtime[5])))
     url = u
     browser.visit(url)
     # 10|10.5
     browser.find_option_by_text(selectOption).first.click()
     browser.find_by_name('commit').click()
     if browser.is_text_present('item'):
-        print("Added to Cart")
+        print("[i] Added to Cart")
     else:
-        print("Error")
+        print("[x] Error")
         return
-    print("Checking out")
+    print("[i] Checking out")
     browser.visit(checkoutUrl)
-    print("Filling Out Billing Info")
+    print("[i] Filling Out Billing Info")
     browser.fill("order[billing_name]", namefield)
     browser.fill("order[email]", emailfield)
     browser.fill("order[tel]", phonefield)
 
-    print("Filling Out Address")
+    print("[i] Filling Out Address")
     browser.fill("order[billing_address]", addressfield)
     browser.fill("order[billing_city]", cityfield) #added by alePistola7CE
     browser.fill("order[billing_zip]", zipfield)
     browser.select("order[billing_country]", statefield) #country not state
-    print("Filling Out Credit Card Info")
+    print("[i] Filling Out Credit Card Info")
 
     browser.select("credit_card[type]", cctypefield)
     browser.fill("credit_card[cnb]", ccnumfield)
@@ -131,18 +132,25 @@ def buyprd(u):
     browser.select("credit_card[year]", ccyearfield)
     browser.fill("credit_card[vval]", cccvcfield) # not credit_card[verification_value] but "credit_card[vval]"
     browser.find_by_css('.terms').click()
-    print("Submitting Info")
+    print("[i] Submitting Info")
     browser.find_by_name('commit').click()
     time.sleep(3)
     print(browser.find_by_id("order-no").value)
+    #print("[i] Ora fine acquisto : %s" % str(time.localtime()))
+    localtime = time.localtime(time.time())
+    print("[i] Ora fine acquisto : %s:%s:%s" % (str(localtime[3]), str(localtime[4]), str(localtime[5])))
     sys.exit(0)
 
 
 i = 0
 
 while (True):
+    #I open now the browser only because of this is a faster way to manage the flow of the application
+    executable_path = {'executable_path':'C:\\Users\\YourUsername\\AppData\\Local\\Google\\chromedriver'} #need to install chromedriver and add the executable path to the constructor
+    browser = Browser('chrome', **executable_path )
+    browser.visit("http://www.google.it")
+    localtime = time.localtime(time.time())
     main()
     i = i + 1
     print("On try number " + str(i))
     time.sleep(2)
-
